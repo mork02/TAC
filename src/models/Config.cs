@@ -1,6 +1,6 @@
 ﻿namespace ActiveTwitch.src.models
 {
-    class Config
+    public record Config
     {
         public bool DarkMode { get; set; }
     }
