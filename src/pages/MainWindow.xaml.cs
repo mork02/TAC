@@ -1,6 +1,10 @@
 ﻿using ActiveTwitch.Pages;
 using ActiveTwitch.src.models;
+using ActiveTwitch.src.utils;
+using System.Diagnostics;
+using System;
 using System.IO;
+using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -12,44 +16,30 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using ActiveTwitch.Models;
 
 namespace ActiveTwitch
 {
     public partial class MainWindow : Window
     {
         private bool _darkMode = false;
-        private readonly string configPath = "src/data/config.json";
 
         public MainWindow()
         {
             InitializeComponent();
-            
 
             Loaded += (_, __) =>
             {
                 MainFrame.Navigate(new HomePage());
-
-                var config = LoadConfig();
-                _darkMode = config.DarkMode;
-                ApplyTheme(_darkMode);
+                LoadConfig();
             };
         }
 
-        private Config LoadConfig()
+        private void LoadConfig()
         {
-            try
-            {
-                if (File.Exists(configPath))
-                {
-                    var json = File.ReadAllText(configPath, Encoding.UTF8);
-                    var config = JsonSerializer.Deserialize<Config>(json);
-                    if (config != null) return config;
-                }
-            } catch (Exception ex)
-            {
-                MessageBox.Show($"[MainWindow::LoadConfig]Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            return null;
+            var data = ConfigManager.Load();
+            _darkMode = data.DarkMode;
+            ApplyTheme(_darkMode);
         }
 
         private void ApplyTheme(bool darkMode)
@@ -71,7 +61,7 @@ namespace ActiveTwitch
 
             } catch ( Exception ex )
             {
-                MessageBox.Show($"[MainWindow::OnSwitchThemeClick]Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                src.utils.Debugger.Debug($"[MainWindow::OnSwitchThemeClick]Error: {ex.Message}");
             }
         }
     }
